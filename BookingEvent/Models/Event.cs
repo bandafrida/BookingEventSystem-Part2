@@ -13,7 +13,7 @@ namespace BookingEvent.Models
 
         public DateTime EventTime { get; set; }
 
-        public required string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
 
         public ICollection<Booking>? Bookings { get; set; }
     }

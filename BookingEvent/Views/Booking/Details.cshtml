@@ -1,0 +1,61 @@
+﻿@model BookingEvent.Models.Booking
+
+@{
+    ViewData["Title"] = "Booking Details";
+}
+
+<div class="container mt-5">
+
+    <div class="card shadow-lg border-0 rounded-4">
+
+        <div class="card-header bg-primary text-white">
+            <h3>Booking Details</h3>
+        </div>
+
+        <div class="card-body">
+
+            <p>
+                <strong>Booking ID:</strong>
+                @Model.BookingId
+            </p>
+
+            <p>
+                <strong>Booking Date:</strong>
+                @Model.BookingDate.ToString("dd MMM yyyy HH:mm")
+            </p>
+
+            <p>
+                <strong>Event:</strong>
+                @Model.Event?.EventName
+            </p>
+
+            <p>
+                <strong>Venue:</strong>
+                @Model.Venue?.VenueName
+            </p>
+
+            <p>
+                <strong>Location:</strong>
+                @Model.Venue?.VenueLocation
+            </p>
+
+        </div>
+
+        <div class="card-footer bg-white">
+
+            <a asp-action="Edit"
+                   asp-route-id="@Model.BookingId"
+                   class="btn btn-warning">
+                Edit
+            </a>
+
+            <a asp-action="Index"
+                   class="btn btn-secondary">
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

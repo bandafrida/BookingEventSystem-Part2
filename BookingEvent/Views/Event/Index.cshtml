@@ -6,16 +6,35 @@
 
 <div class="container mt-5">
 
+    <!-- ERROR ALERT -->
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show"
+             role="alert">
+
+            @TempData["Error"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+    <!-- PAGE HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <h1 class="fw-bold">Events</h1>
+        <h1 class="fw-bold text-dark">Events</h1>
 
-        <a asp-action="Create" class="btn btn-success">
-            Create Event
+        <a asp-action="Create"
+               class="btn btn-success shadow-sm">
+            + Create Event
         </a>
 
     </div>
 
+    <!-- EVENT CARDS -->
     <div class="row">
 
         @foreach (var item in Model)
@@ -24,17 +43,20 @@
 
                 <div class="card shadow-lg border-0 rounded-4 h-100">
 
-                    <!-- Image -->
-                    <img src="@Url.Content(item.ImageUrl)"
+                    <!-- EVENT IMAGE -->
+                    <img src="@item.ImageUrl"
                          class="card-img-top"
                          style="height:250px; object-fit:cover;"
-                         onerror="this.src='/images/default.jpg'" />
+                         onerror="this.src='/images/wall.jpg';" />
 
+                    <!-- CARD BODY -->
                     <div class="card-body">
 
-                        <h4 class="fw-bold">@item.EventName</h4>
+                        <h4 class="fw-bold text-primary">
+                            @item.EventName
+                        </h4>
 
-                        <p>
+                        <p class="mb-2">
                             <strong>Date:</strong>
                             @item.EventDate.ToString("dd MMM yyyy")
                         </p>
@@ -46,23 +68,26 @@
 
                     </div>
 
-                    <!-- ACTION BUTTONS -->
+                    <!-- CARD FOOTER -->
                     <div class="card-footer bg-white border-0">
 
                         <div class="d-flex gap-2">
 
+                            <!-- DETAILS -->
                             <a asp-action="Details"
                                    asp-route-id="@item.EventId"
                                    class="btn btn-primary btn-sm w-100">
                                 Details
                             </a>
 
+                            <!-- EDIT -->
                             <a asp-action="Edit"
                                    asp-route-id="@item.EventId"
-                                   class="btn btn-warning btn-sm w-100">
+                                   class="btn btn-warning btn-sm w-100 text-white">
                                 Edit
                             </a>
 
+                            <!-- DELETE -->
                             <a asp-action="Delete"
                                    asp-route-id="@item.EventId"
                                    class="btn btn-danger btn-sm w-100">

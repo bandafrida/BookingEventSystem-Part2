@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookingEvent.Models
 {
@@ -9,13 +8,9 @@ namespace BookingEvent.Models
         public int BookingId { get; set; }
 
         public DateTime BookingDate { get; set; }
-
-        [ForeignKey("VenueId")]
         public int VenueId { get; set; }
-        public Venue Venue { get; set; }
-
-        [ForeignKey("EventId")]
+        public Venue? Venue { get; set; }
         public int EventId { get; set; }
-        public Event Event { get; set; }
+        public Event? Event { get; set; }
     }
 }

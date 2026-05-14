@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookingEvent.Models;
+using BookingEvent.Services;
 
 namespace BookingEvent.Controllers
 {
     public class VenueController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly BlobService _blobService;
 
-        public VenueController(ApplicationDbContext context)
+        public VenueController(ApplicationDbContext context, BlobService blobService)
         {
             _context = context;
+            _blobService = blobService;
         }
 
         // INDEX
@@ -42,11 +45,19 @@ namespace BookingEvent.Controllers
         // CREATE (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Venue venue)
+        public async Task<IActionResult> Create(Venue venue, IFormFile? ImageFile)
         {
+            if (ImageFile == null)
+            {
+                ModelState.AddModelError("", "Please upload a venue image.");
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(venue);
+                string imageUrl = await _blobService.UploadFileAsync(ImageFile!);
+                venue.ImageUrl = imageUrl;
+
+                _context.Venues.Add(venue);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
@@ -70,18 +81,35 @@ namespace BookingEvent.Controllers
         // EDIT (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Venue venue)
+        public async Task<IActionResult> Edit(int id, Venue venue, IFormFile? ImageFile)
         {
             if (id != venue.VenueId) return NotFound();
 
+            var existingVenue = await _context.Venues
+                .AsNoTracking()
+                .FirstOrDefaultAsync(v => v.VenueId == id);
+
+            if (existingVenue == null) return NotFound();
+
             if (ModelState.IsValid)
             {
+                if (ImageFile != null)
+                {
+                    string imageUrl = await _blobService.UploadFileAsync(ImageFile);
+                    venue.ImageUrl = imageUrl;
+                }
+                else
+                {
+                    venue.ImageUrl = existingVenue.ImageUrl;
+                }
+
                 _context.Update(venue);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }
 
+            venue.ImageUrl = existingVenue.ImageUrl;
             return View(venue);
         }
 
@@ -103,10 +131,22 @@ namespace BookingEvent.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            bool hasBookings = await _context.Bookings
+                .AnyAsync(b => b.VenueId == id);
+
+            if (hasBookings)
+            {
+                TempData["Error"] = "This venue cannot be deleted because it has active bookings.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var venue = await _context.Venues.FindAsync(id);
 
-            _context.Venues.Remove(venue);
-            await _context.SaveChangesAsync();
+            if (venue != null)
+            {
+                _context.Venues.Remove(venue);
+                await _context.SaveChangesAsync();
+            }
 
             return RedirectToAction(nameof(Index));
         }

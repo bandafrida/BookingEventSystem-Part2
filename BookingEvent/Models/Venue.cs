@@ -9,6 +9,6 @@ namespace BookingEvent.Models
         public required string VenueName { get; set; }
         public required string VenueLocation { get; set; }
         public int VenueCapacity { get; set; }
-        public required string ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

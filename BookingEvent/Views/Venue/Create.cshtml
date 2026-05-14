@@ -13,50 +13,79 @@
             <div class="card shadow-lg border-0 rounded-4">
 
                 <div class="card-header bg-dark text-white">
-                    <h3>Create Venue</h3>
+                    <h3 class="mb-0">Create Venue</h3>
                 </div>
 
-                <div class="card-body">
+                <div class="card-body p-4">
 
-                    <form asp-action="Create">
+                    <form asp-action="Create" enctype="multipart/form-data">
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div asp-validation-summary="All" class="alert alert-danger"></div>
 
                         <!-- Venue Name -->
                         <div class="mb-3">
-                            <label asp-for="VenueName" class="form-label"></label>
-                            <input asp-for="VenueName" class="form-control" />
-                            <span asp-validation-for="VenueName" class="text-danger"></span>
+                            <label asp-for="VenueName" class="form-label fw-bold"></label>
+
+                            <input asp-for="VenueName"
+                                   class="form-control"
+                                   placeholder="Enter venue name" />
+
+                            <span asp-validation-for="VenueName"
+                                  class="text-danger"></span>
                         </div>
 
-                        <!-- Location -->
+                        <!-- Venue Location -->
                         <div class="mb-3">
-                            <label asp-for="VenueLocation" class="form-label"></label>
-                            <input asp-for="VenueLocation" class="form-control" />
-                            <span asp-validation-for="VenueLocation" class="text-danger"></span>
+                            <label asp-for="VenueLocation" class="form-label fw-bold"></label>
+
+                            <input asp-for="VenueLocation"
+                                   class="form-control"
+                                   placeholder="Enter venue location" />
+
+                            <span asp-validation-for="VenueLocation"
+                                  class="text-danger"></span>
                         </div>
 
-                        <!-- Capacity -->
+                        <!-- Venue Capacity -->
                         <div class="mb-3">
-                            <label asp-for="VenueCapacity" class="form-label"></label>
-                            <input asp-for="VenueCapacity" class="form-control" />
-                            <span asp-validation-for="VenueCapacity" class="text-danger"></span>
+                            <label asp-for="VenueCapacity" class="form-label fw-bold"></label>
+
+                            <input asp-for="VenueCapacity"
+                                   type="number"
+                                   min="1"
+                                   class="form-control"
+                                   placeholder="Enter capacity" />
+
+                            <span asp-validation-for="VenueCapacity"
+                                  class="text-danger"></span>
                         </div>
 
-                        <!-- Image -->
-                        <div class="mb-3">
-                            <label asp-for="ImageUrl" class="form-label"></label>
-                            <input asp-for="ImageUrl" class="form-control" />
-                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        <!-- Upload Image -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                Upload Venue Image
+                            </label>
+
+                            <input type="file"
+                                   name="ImageFile"
+                                   class="form-control"
+                                   accept="image/*" />
                         </div>
 
-                        <button type="submit" class="btn btn-success w-100">
-                            Create Venue
-                        </button>
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
 
-                        <a asp-action="Index" class="btn btn-secondary w-100 mt-2">
-                            Back
-                        </a>
+                            <button type="submit"
+                                    class="btn btn-success w-100">
+                                Create Venue
+                            </button>
+
+                            <a asp-action="Index"
+                                   class="btn btn-secondary w-100">
+                                Back
+                            </a>
+
+                        </div>
 
                     </form>
 
@@ -69,3 +98,9 @@
     </div>
 
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

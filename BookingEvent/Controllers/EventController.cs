@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BookingEvent.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookingEvent.Models;
 
@@ -7,10 +8,12 @@ namespace BookingEvent.Controllers
     public class EventController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly BlobService _blobService;
 
-        public EventController(ApplicationDbContext context)
+        public EventController(ApplicationDbContext context, BlobService blobService)
         {
             _context = context;
+            _blobService = blobService;
         }
 
         // =========================
@@ -50,10 +53,18 @@ namespace BookingEvent.Controllers
         // =========================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Event eventModel)
+        public async Task<IActionResult> Create(Event eventModel, IFormFile ImageFile)
         {
+            if (ImageFile == null)
+            {
+                ModelState.AddModelError("", "Please upload an event image.");
+            }
+
             if (ModelState.IsValid)
             {
+                string imageUrl = await _blobService.UploadFileAsync(ImageFile);
+                eventModel.ImageUrl = imageUrl;
+
                 _context.Events.Add(eventModel);
                 await _context.SaveChangesAsync();
 
@@ -82,12 +93,30 @@ namespace BookingEvent.Controllers
         // =========================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Event eventModel)
+        public async Task<IActionResult> Edit(int id, Event eventModel, IFormFile? ImageFile)
         {
-            if (id != eventModel.EventId) return NotFound();
+            if (id != eventModel.EventId)
+                return NotFound();
 
             if (ModelState.IsValid)
             {
+                var existingEvent = await _context.Events
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(e => e.EventId == id);
+
+                if (existingEvent == null)
+                    return NotFound();
+
+                if (ImageFile != null)
+                {
+                    string imageUrl = await _blobService.UploadFileAsync(ImageFile);
+                    eventModel.ImageUrl = imageUrl;
+                }
+                else
+                {
+                    eventModel.ImageUrl = existingEvent.ImageUrl;
+                }
+
                 _context.Update(eventModel);
                 await _context.SaveChangesAsync();
 
@@ -119,10 +148,22 @@ namespace BookingEvent.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            bool hasBookings = await _context.Bookings
+                .AnyAsync(b => b.EventId == id);
+
+            if (hasBookings)
+            {
+                TempData["Error"] = "This event cannot be deleted because it has active bookings.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var eventModel = await _context.Events.FindAsync(id);
 
-            _context.Events.Remove(eventModel);
-            await _context.SaveChangesAsync();
+            if (eventModel != null)
+            {
+                _context.Events.Remove(eventModel);
+                await _context.SaveChangesAsync();
+            }
 
             return RedirectToAction(nameof(Index));
         }

@@ -4,41 +4,158 @@
     ViewData["Title"] = "Bookings";
 }
 
-<div class="container mt-4">
+<div class="container mt-5">
 
-    <div class="d-flex justify-content-between mb-3">
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <h2>Bookings</h2>
+        <h1 class="fw-bold">
+            📌 Bookings
+        </h1>
 
-        <a asp-action="Create" class="btn btn-success">
-            Create Booking
+        <a asp-action="Create"
+               class="btn btn-success shadow-sm">
+            + Create Booking
         </a>
 
     </div>
 
-    <table class="table table-striped table-bordered">
+    <!-- SEARCH BAR -->
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
 
-        <thead class="table-dark">
-            <tr>
-                <th>Date</th>
-                <th>Event</th>
-                <th>Venue</th>
-            </tr>
-        </thead>
+        <div class="card-body">
 
-        <tbody>
+            <form method="get">
 
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.BookingDate.ToString("dd MMM yyyy HH:mm")</td>
-                    <td>@item.Event?.EventName</td>
-                    <td>@item.Venue?.VenueName</td>
-                </tr>
-            }
+                <div class="row g-2">
 
-        </tbody>
+                    <div class="col-md-10">
 
-    </table>
+                        <input type="text"
+                               name="searchString"
+                               class="form-control"
+                               placeholder="Search by Booking ID, Event or Venue..." />
+
+                    </div>
+
+                    <div class="col-md-2 d-grid">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Search
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <!-- BOOKINGS TABLE -->
+    <div class="card shadow-lg border-0 rounded-4">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Booking Date</th>
+                            <th>Event</th>
+                            <th>Venue</th>
+                            <th>Location</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        <strong>#@item.BookingId</strong>
+                                    </td>
+
+                                    <td>
+                                        @item.BookingDate.ToString("dd MMM yyyy HH:mm")
+                                    </td>
+
+                                    <td>
+                                        @item.Event?.EventName
+                                    </td>
+
+                                    <td>
+                                        @item.Venue?.VenueName
+                                    </td>
+
+                                    <td>
+                                        @item.Venue?.VenueLocation
+                                    </td>
+
+                                    <td>
+
+                                        <div class="d-flex gap-2 justify-content-center">
+
+                                            <a asp-action="Details"
+                                                   asp-route-id="@item.BookingId"
+                                                   class="btn btn-primary btn-sm">
+                                                Details
+                                            </a>
+
+                                            <a asp-action="Edit"
+                                                   asp-route-id="@item.BookingId"
+                                                   class="btn btn-warning btn-sm text-white">
+                                                Edit
+                                            </a>
+
+                                            <a asp-action="Delete"
+                                                   asp-route-id="@item.BookingId"
+                                                   class="btn btn-danger btn-sm">
+                                                Delete
+                                            </a>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+
+                                <td colspan="6"
+                                    class="text-center text-muted py-4">
+
+                                    No bookings found.
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
